@@ -1,4 +1,7 @@
 import React, { useState } from "react"
+import Form from "./components/Form"
+import Display from "./components/Display"
+import Filter from "./components/Filter"
 
 const App = () => {
   const [persons, setPersons] = useState([
@@ -14,7 +17,6 @@ const App = () => {
   const addPerson = event => {
     event.preventDefault()
     if (!persons.some(e => e.name === newName)) {
-      console.log(persons)
       const Object = {
         name: newName,
         number: newNumber
@@ -23,7 +25,6 @@ const App = () => {
       setPersons(persons.concat(Object))
       setNewName("")
       setNewNumber("")
-      console.log("täällä", newName)
     } else {
       window.alert(`${newName} is already added to the phonebook`)
     }
@@ -34,7 +35,6 @@ const App = () => {
 
   const handleFilterChange = event => {
     setNewFilter(event.target.value)
-    console.log(persons.map(item => item.name.includes(filter)))
   }
 
   const personsToShow = filter
@@ -46,41 +46,24 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter: <input value={filter} onChange={handleFilterChange} />
-      </div>
+
+      <Filter filter={filter} handleFilterChange={handleFilterChange} />
+
       <h2>add a new</h2>
-      <Form />
+
+      <Form
+        addPerson={addPerson}
+        newName={newName}
+        newNumber={newNumber}
+        handleNameChange={handleNameChange}
+        handleNumberChange={handleNumberChange}
+      />
+
       <h2>Numbers</h2>
-      <div>
-        <Display persons={personsToShow} />
-      </div>
+
+      <Display persons={personsToShow} />
     </div>
   )
-}
-// TÄS JUMIS
-const Form = () => {
-  return (
-    <form onSubmit={addPerson}>
-      <div>
-        name: <input value={newName} onChange={handleNameChange} />
-      </div>
-      <div>
-        number: <input value={newNumber} onChange={handleNumberChange} />
-      </div>
-      <div>
-        <button type="submit">add</button>
-      </div>
-    </form>
-  )
-}
-
-const Display = ({ persons }) => {
-  return persons.map(item => (
-    <p key={item.name}>
-      {item.name} {item.number}
-    </p>
-  ))
 }
 
 export default App
