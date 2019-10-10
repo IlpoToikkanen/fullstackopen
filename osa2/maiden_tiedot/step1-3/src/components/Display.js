@@ -31,12 +31,10 @@ const Display = ({ countries, setFilter }) => {
           `http://api.weatherstack.com/current?access_key=bc3e880c9b855eb92dbe37fc3c69cf67&query=${countries[0].capital}`
         )
         .then(response => {
-          console.log(response.data)
           setWeather(response.data)
         })
     }
 
-    console.log(capital)
     return (
       <div>
         <h2>{countries[0].name}</h2>
