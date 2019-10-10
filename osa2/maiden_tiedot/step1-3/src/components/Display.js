@@ -35,7 +35,6 @@ const Display = ({ countries, setFilter }) => {
           setWeather(response.data)
         })
     }
-    console.log("promise fulfilled")
 
     console.log(capital)
     return (
