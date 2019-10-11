@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react"
 import Form from "./components/Form"
 import Display from "./components/Display"
 import Filter from "./components/Filter"
-import axios from "axios"
+import dbService from "./services/dbService"
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -11,26 +11,39 @@ const App = () => {
   const [filter, setNewFilter] = useState("")
 
   useEffect(() => {
-    console.log("effect")
-    axios.get("http://localhost:3001/persons").then(response => {
-      console.log("promise fulfilled")
-      setPersons(response.data)
-    })
+    dbService.getAll().then(data => setPersons(data))
   }, [])
 
   const addPerson = event => {
     event.preventDefault()
-    if (!persons.some(e => e.name === newName)) {
-      const Object = {
+    if (persons.some(e => e.name === newName)) {
+      console.log("täällä")
+      if (
+        window.confirm(
+          `${newName} is already added to the phonebook, replace the old number with a new one?`
+        )
+      ) {
+        const changedObject = {
+          name: newName,
+          number: newNumber
+        }
+        const personNames = persons.map(person => person.name)
+        const id = personNames.indexOf(newName) + 1
+        dbService.updatePerson(changedObject, id)
+        dbService.getAll().then(data => setPersons(data))
+        return null
+      }
+      return null
+    } else {
+      const personObject = {
         name: newName,
         number: newNumber
       }
-
-      setPersons(persons.concat(Object))
-      setNewName("")
-      setNewNumber("")
-    } else {
-      window.alert(`${newName} is already added to the phonebook`)
+      dbService.create(personObject).then(data => {
+        setPersons(persons.concat(data))
+        setNewName("")
+        setNewNumber("")
+      })
     }
   }
   const handleNameChange = event => setNewName(event.target.value)
@@ -65,7 +78,7 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <Display persons={personsToShow} />
+      <Display persons={personsToShow} setPersons={setPersons} />
     </div>
   )
 }
