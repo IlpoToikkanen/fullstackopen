@@ -3,10 +3,9 @@ import dbService from "../services/dbService"
 
 const Display = ({ persons, setPersons }) => {
   const handleDeleteClick = person => {
-    console.log(person)
     if (window.confirm(`Delete ${person.name} ?`)) {
       dbService.remove(person.id)
-      console.log(person.id)
+
       setPersons(persons.filter(n => n.id !== person.id))
       return null
     }
