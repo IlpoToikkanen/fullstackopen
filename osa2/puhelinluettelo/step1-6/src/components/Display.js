@@ -6,7 +6,7 @@ const Display = ({ persons, setPersons }) => {
     console.log(person)
     if (window.confirm(`Delete ${person.name} ?`)) {
       dbService.remove(person.id)
-      dbService.getAll().then(data => setPersons(data))
+      setPersons(persons.filter(n => n.id !== person.id))
       return null
     }
   }

@@ -28,9 +28,16 @@ const App = () => {
           number: newNumber
         }
         const personNames = persons.map(person => person.name)
-        const id = personNames.indexOf(newName) + 1
+        const index = personNames.indexOf(newName)
+        const id = persons[index].id
         dbService.updatePerson(changedObject, id)
-        dbService.getAll().then(data => setPersons(data))
+        const pCopy = (persons, index, changedObject) => {
+          const ret = persons.slice(0)
+          ret[index] = changedObject
+          return ret
+        }
+
+        setPersons(pCopy)
         return null
       }
       return null

@@ -1,19 +1,14 @@
 {
   "persons": [
     {
-      "name": "Timo Haario",
-      "number": "041235",
-      "id": 1
-    },
-    {
-      "name": "Timo Herra",
-      "number": "12345",
-      "id": 2
-    },
-    {
       "name": "Tomi Harre",
-      "number": "123566",
+      "number": "123",
       "id": 3
+    },
+    {
+      "name": "Pelle Hermanni",
+      "number": "1234",
+      "id": 4
     }
   ]
 }
