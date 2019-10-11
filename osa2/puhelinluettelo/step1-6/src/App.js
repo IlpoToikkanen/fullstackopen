@@ -23,20 +23,17 @@ const App = () => {
           `${newName} is already added to the phonebook, replace the old number with a new one?`
         )
       ) {
+        const index = persons.map(person => person.name).indexOf(newName)
+        const id = persons[index].id
         const changedObject = {
           name: newName,
-          number: newNumber
-        }
-        const personNames = persons.map(person => person.name)
-        const index = personNames.indexOf(newName)
-        const id = persons[index].id
-        dbService.updatePerson(changedObject, id)
-        const pCopy = (persons, index, changedObject) => {
-          const ret = persons.slice(0)
-          ret[index] = changedObject
-          return ret
+          number: newNumber,
+          id: id
         }
 
+        dbService.updatePerson(changedObject, id)
+        const pCopy = [...persons]
+        pCopy[index] = changedObject
         setPersons(pCopy)
         return null
       }
