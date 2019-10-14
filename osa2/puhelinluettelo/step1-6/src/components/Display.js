@@ -1,15 +1,6 @@
 import React from "react"
-import dbService from "../services/dbService"
 
-const Display = ({ persons, setPersons }) => {
-  const handleDeleteClick = person => {
-    if (window.confirm(`Delete ${person.name} ?`)) {
-      dbService.remove(person.id)
-
-      setPersons(persons.filter(n => n.id !== person.id))
-      return null
-    }
-  }
+const Display = ({ persons, handleDeleteClick }) => {
   return (
     <div>
       {persons.map(person => {

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 import Form from "./components/Form"
 import Display from "./components/Display"
 import Filter from "./components/Filter"
+import Notification from "./components/Notification"
 import dbService from "./services/dbService"
 
 const App = () => {
@@ -9,6 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState("")
   const [newNumber, setNewNumber] = useState("")
   const [filter, setNewFilter] = useState("")
+  const [notificationInformation, setNotificationInformation] = useState(null)
 
   useEffect(() => {
     dbService.getAll().then(data => setPersons(data))
@@ -24,16 +26,40 @@ const App = () => {
       ) {
         const index = persons.map(person => person.name).indexOf(newName)
         const id = persons[index].id
-        const changedObject = {
+        const changedPerson = {
           name: newName,
           number: newNumber,
           id: id
         }
 
-        dbService.updatePerson(changedObject, id)
-        const pCopy = [...persons]
-        pCopy[index] = changedObject
-        setPersons(pCopy)
+        dbService
+          .updatePerson(changedPerson, id)
+          .then(returnedPerson => {
+            setPersons(
+              persons.map(person =>
+                person.id !== id ? person : returnedPerson
+              )
+            )
+            setNotificationInformation({
+              text: `Number for ${newName} updated succesfully`,
+              type: "notification"
+            })
+            setTimeout(() => {
+              setNotificationInformation(null)
+            }, 3000)
+            setNewName("")
+            setNewNumber("")
+          })
+          .catch(error => {
+            setNotificationInformation({
+              text: `${newName} no longer exists in the phonebook`,
+              type: "error"
+            })
+            setTimeout(() => {
+              setNotificationInformation(null)
+            }, 3000)
+            setPersons(persons.filter(n => n.name !== newName))
+          })
         return null
       }
       return null
@@ -44,9 +70,43 @@ const App = () => {
       }
       dbService.create(personObject).then(data => {
         setPersons(persons.concat(data))
+        setNotificationInformation({
+          text: `Added ${newName}`,
+          type: "notification"
+        })
+        setTimeout(() => {
+          setNotificationInformation(null)
+        }, 3000)
         setNewName("")
         setNewNumber("")
       })
+    }
+  }
+  const handleDeleteClick = person => {
+    if (window.confirm(`Delete ${person.name} ?`)) {
+      dbService
+        .remove(person.id)
+        .then(() => {
+          setNotificationInformation({
+            text: `Deleted ${person.name}`,
+            type: "notification"
+          })
+          setTimeout(() => {
+            setNotificationInformation(null)
+          }, 3000)
+          setPersons(persons.filter(n => n.id !== person.id))
+        })
+        .catch(error => {
+          setNotificationInformation({
+            text: `${person.name} no longer exists in the phonebook`,
+            type: "error"
+          })
+          setTimeout(() => {
+            setNotificationInformation(null)
+          }, 3000)
+          setPersons(persons.filter(n => n.name !== person.name))
+        })
+      return null
     }
   }
   const handleNameChange = event => setNewName(event.target.value)
@@ -66,7 +126,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-
+      <Notification information={notificationInformation} />
       <Filter filter={filter} handleFilterChange={handleFilterChange} />
 
       <h2>add a new</h2>
@@ -81,7 +141,7 @@ const App = () => {
 
       <h2>Numbers</h2>
 
-      <Display persons={personsToShow} setPersons={setPersons} />
+      <Display persons={personsToShow} handleDeleteClick={handleDeleteClick} />
     </div>
   )
 }

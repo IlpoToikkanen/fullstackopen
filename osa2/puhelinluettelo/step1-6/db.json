@@ -1,11 +1,6 @@
 {
   "persons": [
     {
-      "name": "Tommi",
-      "number": "123",
-      "id": 2
-    },
-    {
       "name": "Timo Haario",
       "number": "0440123123",
       "id": 3
@@ -16,9 +11,14 @@
       "id": 4
     },
     {
-      "name": "Jesse Maankaivaja",
-      "number": "0505952091",
+      "name": "Tommi Perkele",
+      "number": "2134451243",
       "id": 5
+    },
+    {
+      "name": "Jesse Perkele",
+      "number": "213435125123",
+      "id": 6
     }
   ]
 }
