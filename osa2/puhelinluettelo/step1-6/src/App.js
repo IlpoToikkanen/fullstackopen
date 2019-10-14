@@ -87,6 +87,7 @@ const App = () => {
       dbService
         .remove(person.id)
         .then(() => {
+          setPersons(persons.filter(n => n.name !== person.name))
           setNotificationInformation({
             text: `Deleted ${person.name}`,
             type: "notification"
@@ -94,9 +95,9 @@ const App = () => {
           setTimeout(() => {
             setNotificationInformation(null)
           }, 3000)
-          setPersons(persons.filter(n => n.id !== person.id))
         })
         .catch(error => {
+          setPersons(persons.filter(n => n.name !== person.name))
           setNotificationInformation({
             text: `${person.name} no longer exists in the phonebook`,
             type: "error"
@@ -104,8 +105,8 @@ const App = () => {
           setTimeout(() => {
             setNotificationInformation(null)
           }, 3000)
-          setPersons(persons.filter(n => n.name !== person.name))
         })
+
       return null
     }
   }
