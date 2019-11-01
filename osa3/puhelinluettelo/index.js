@@ -98,17 +98,18 @@ app.get("/info", (req, res) => {
 })
 
 app.delete("/api/persons/:id", (req, res, next) => {
-  Person.findById(req.params.id)
-    .then(() =>
-      Person.findByIdAndRemove(req.params.id).then(result => {
+  Person.findByIdAndRemove(req.params.id)
+    .then(result => {
+      if (result) {
         res.status(204).end()
-      })
-    )
+      } else {
+        res.status(400).end()
+      }
+    })
     .catch(error => next(error))
 })
 
 app.post("/api/persons", (req, res, next) => {
-  console.log(req.body)
   const body = req.body
 
   if (!body.name) {
@@ -158,6 +159,8 @@ const errorHandler = (error, req, res, next) => {
 
   if (error.name === "CastError" && error.kind == "ObjectId") {
     return res.status(400).send({ error: "malformatted id" })
+  } else if (error.name === "ValidationError") {
+    return res.status(400).send({ error: error.message })
   }
 
   next(error)
