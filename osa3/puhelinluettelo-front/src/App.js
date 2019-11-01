@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from "react"
-import Form from "./components/Form"
-import Display from "./components/Display"
-import Filter from "./components/Filter"
-import Notification from "./components/Notification"
-import dbService from "./services/dbService"
+import React, { useState, useEffect } from 'react'
+import Form from './components/Form'
+import Display from './components/Display'
+import Filter from './components/Filter'
+import Notification from './components/Notification'
+import dbService from './services/dbService'
 
 const App = () => {
   const [persons, setPersons] = useState([])
-  const [newName, setNewName] = useState("")
-  const [newNumber, setNewNumber] = useState("")
-  const [filter, setNewFilter] = useState("")
+  const [newName, setNewName] = useState('')
+  const [newNumber, setNewNumber] = useState('')
+  const [filter, setNewFilter] = useState('')
   const [notificationInformation, setNotificationInformation] = useState(null)
 
   useEffect(() => {
@@ -20,8 +20,8 @@ const App = () => {
     event.preventDefault()
     if (!newName) {
       setNotificationInformation({
-        text: `Please insert name`,
-        type: "error"
+        text: 'Please insert name',
+        type: 'error'
       })
       setTimeout(() => {
         setNotificationInformation(null)
@@ -29,8 +29,8 @@ const App = () => {
       return null
     } else if (!newNumber) {
       setNotificationInformation({
-        text: `Please insert number`,
-        type: "error"
+        text: 'Please insert number',
+        type: 'error'
       })
       setTimeout(() => {
         setNotificationInformation(null)
@@ -60,18 +60,18 @@ const App = () => {
             )
             setNotificationInformation({
               text: `Number for ${newName} updated succesfully`,
-              type: "notification"
+              type: 'notification'
             })
             setTimeout(() => {
               setNotificationInformation(null)
             }, 3000)
-            setNewName("")
-            setNewNumber("")
+            setNewName('')
+            setNewNumber('')
           })
-          .catch(error => {
+          .catch(() => {
             setNotificationInformation({
               text: `${newName} no longer exists in the phonebook`,
-              type: "error"
+              type: 'error'
             })
             setTimeout(() => {
               setNotificationInformation(null)
@@ -92,18 +92,18 @@ const App = () => {
           setPersons(persons.concat(data))
           setNotificationInformation({
             text: `Added ${newName}`,
-            type: "notification"
+            type: 'notification'
           })
           setTimeout(() => {
             setNotificationInformation(null)
           }, 3000)
-          setNewName("")
-          setNewNumber("")
+          setNewName('')
+          setNewNumber('')
         })
         .catch(error => {
           setNotificationInformation({
             text: error.response.data.error,
-            type: "error"
+            type: 'error'
           })
           setTimeout(() => {
             setNotificationInformation(null)
@@ -115,21 +115,21 @@ const App = () => {
     if (window.confirm(`Delete ${person.name} ?`)) {
       dbService
         .remove(person.id)
-        .then(response => {
+        .then(() => {
           setPersons(persons.filter(n => n.name !== person.name))
           setNotificationInformation({
             text: `Deleted ${person.name}`,
-            type: "notification"
+            type: 'notification'
           })
           setTimeout(() => {
             setNotificationInformation(null)
           }, 3000)
         })
-        .catch(error => {
+        .catch(() => {
           setPersons(persons.filter(n => n.name !== person.name))
           setNotificationInformation({
             text: `${person.name} no longer exists in the phonebook`,
-            type: "error"
+            type: 'error'
           })
           setTimeout(() => {
             setNotificationInformation(null)

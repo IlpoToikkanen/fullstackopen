@@ -1,17 +1,17 @@
-import React from "react"
+import React from 'react'
 
 const Notification = ({ information }) => {
   const notificationStyle = {
-    color: "green",
-    border: "2px solid green",
-    borderRadius: "5px",
-    fontSize: "25px"
+    color: 'green',
+    border: '2px solid green',
+    borderRadius: '5px',
+    fontSize: '25px'
   }
   const errorStyle = {
-    color: "red",
-    border: "2px solid red",
-    borderRadius: "5px",
-    fontSize: "25px"
+    color: 'red',
+    border: '2px solid red',
+    borderRadius: '5px',
+    fontSize: '25px'
   }
   if (information === null) {
     return null
@@ -20,7 +20,7 @@ const Notification = ({ information }) => {
   return (
     <div
       className="notification"
-      style={information.type === "error" ? errorStyle : notificationStyle}
+      style={information.type === 'error' ? errorStyle : notificationStyle}
     >
       {information.text}
     </div>

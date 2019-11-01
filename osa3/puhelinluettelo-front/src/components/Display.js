@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 const Display = ({ persons, handleDeleteClick }) => {
   return (
@@ -7,9 +7,9 @@ const Display = ({ persons, handleDeleteClick }) => {
         return (
           <div key={person.name}>
             <p>
-              {person.name} {person.number}{" "}
+              {person.name} {person.number}{' '}
               <Button
-                text={"delete"}
+                text={'delete'}
                 onClick={() => handleDeleteClick(person)}
               />
             </p>
