@@ -1,31 +1,41 @@
 import React, { useState, useEffect } from 'react'
 import blogService from './services/blogs'
 import loginService from './services/login'
+import Blog from './components/Blog'
 import LoginView from './components/LoginView'
 import LoggedView from './components/LoggedView'
 import Notification from './components/Notification'
+import Togglable from './components/Togglable'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
+
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
+
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
+
   const [notificationInformation, setNotificationInformation] = useState(null)
 
   useEffect(() => {
-    blogService.getAll().then(initialBlogs => {
-      console.log(initialBlogs, 'initial')
-      setBlogs(initialBlogs)
-    })
-  }, [])
+    const fetchData = async () => {
+      if (user) {
+        const initialBlogs = await blogService.getAll()
+        console.log(initialBlogs)
+        setBlogs(initialBlogs)
+      }
+    }
+    fetchData()
+  }, [user])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedNoteappUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
+      blogService.setToken(user.token)
       setUser(user)
     }
   }, [])
@@ -37,10 +47,9 @@ const App = () => {
         username: username,
         password: password
       })
-      console.log(user)
 
-      window.localStorage.setItem('loggedNoteappUser', JSON.stringify(user))
-      console.log(user.token)
+      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
+
       blogService.setToken(user.token)
       setUser(user)
       setUsername('')
@@ -53,9 +62,11 @@ const App = () => {
       setTimeout(() => setNotificationInformation(null), 4000)
     }
   }
+  const loggedViewRef = React.createRef()
 
   const addBlog = async event => {
     event.preventDefault()
+    loggedViewRef.current.toggleVisibility()
     const newBlog = {
       title: title,
       author: author,
@@ -63,16 +74,19 @@ const App = () => {
     }
     try {
       const response = await blogService.create(newBlog)
-      console.log(response)
+
       setBlogs(blogs.concat(response))
       setNotificationInformation({
         text: `a new blog ${response.title} by ${response.author} added!`,
         type: 'notification'
       })
       setTimeout(() => setNotificationInformation(null), 4000)
+      setTitle('')
+      setAuthor('')
+      setUrl('')
     } catch (exception) {
       setNotificationInformation({
-        text: exception,
+        text: `${exception}, blogin lisäys`,
         type: 'error'
       })
       setTimeout(() => setNotificationInformation(null), 4000)
@@ -96,40 +110,69 @@ const App = () => {
     setUrl(event.target.value)
   }
 
+  const sortedBlogs = blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1))
+  const rows = () =>
+    sortedBlogs.map(blog => (
+      <Blog
+        key={blog.id}
+        blog={blog}
+        blogs={blogs}
+        setBlogs={setBlogs}
+        user={user}
+      />
+    ))
+
+  const loginView = () => (
+    <>
+      <h2>log in to application</h2>
+      <Notification information={notificationInformation} />
+      <LoginView
+        username={username}
+        password={password}
+        handleUsernameChange={handleUsernameChange}
+        handlePasswordChange={handlePasswordChange}
+        handleLogin={handleLogin}
+      />
+    </>
+  )
+
+  const loggedView = () => (
+    <>
+      <h2>blogs</h2>
+      <Notification information={notificationInformation} />
+      <p>
+        {user.name} logged in {logoutButton()}
+      </p>
+      <Togglable buttonLabel="new blog" ref={loggedViewRef}>
+        <>
+          <LoggedView
+            title={title}
+            author={author}
+            url={url}
+            addBlog={addBlog}
+            handleTitleChange={handleTitleChange}
+            handleAuthorChange={handleAuthorChange}
+            handleUrlChange={handleUrlChange}
+          />
+        </>
+      </Togglable>
+      {rows()}
+    </>
+  )
+  const logoutButton = () => (
+    <button
+      onClick={() => {
+        window.localStorage.removeItem('loggedBlogappUser')
+        setUser(null)
+      }}
+    >
+      logout
+    </button>
+  )
+
   return (
     <>
-      <div>
-        {user === null ? (
-          <>
-            <h2>log in to application</h2>
-            <Notification information={notificationInformation} />
-            <LoginView
-              username={username}
-              password={password}
-              handleUsernameChange={handleUsernameChange}
-              handlePasswordChange={handlePasswordChange}
-              handleLogin={handleLogin}
-            />
-          </>
-        ) : (
-          <>
-            <h2>blogs</h2>
-            <Notification information={notificationInformation} />
-            <LoggedView
-              user={user}
-              title={title}
-              author={author}
-              url={url}
-              blogs={blogs}
-              addBlog={addBlog}
-              setUser={setUser}
-              handleTitleChange={handleTitleChange}
-              handleAuthorChange={handleAuthorChange}
-              handleUrlChange={handleUrlChange}
-            />
-          </>
-        )}
-      </div>
+      <div>{user === null ? <>{loginView()}</> : <>{loggedView()}</>}</div>
     </>
   )
 }

@@ -1,33 +1,17 @@
 import React from 'react'
-import Blog from './Blog'
+import PropTypes from 'prop-types'
 
 const LoggedView = ({
-  user,
   title,
   author,
   url,
-  blogs,
   addBlog,
-  setUser,
   handleTitleChange,
   handleAuthorChange,
   handleUrlChange
 }) => {
-  const rows = () => blogs.map(blog => <Blog key={blog.id} blog={blog} />)
-
   return (
     <>
-      <p>
-        {user.name} logged in{' '}
-        <button
-          onClick={() => {
-            window.localStorage.removeItem('loggedNoteappUser')
-            setUser(null)
-          }}
-        >
-          logout
-        </button>
-      </p>
       <h2>create new</h2>
       <div>
         <form onSubmit={addBlog}>
@@ -61,9 +45,18 @@ const LoggedView = ({
           <button type="submit">create</button>
         </form>
       </div>
-      {rows()}
     </>
   )
+}
+
+LoggedView.propTypes = {
+  title: PropTypes.string.isRequired,
+  author: PropTypes.string.isRequired,
+  url: PropTypes.string.isRequired,
+  addBlog: PropTypes.func.isRequired,
+  handleTitleChange: PropTypes.func.isRequired,
+  handleAuthorChange: PropTypes.func.isRequired,
+  handleUrlChange: PropTypes.func.isRequired
 }
 
 export default LoggedView
