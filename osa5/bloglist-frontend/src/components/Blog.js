@@ -64,11 +64,14 @@ const Blog = ({ blog, blogs, setBlogs, user }) => {
   }
 
   return (
-    <div style={blogStyle}>
-      <div onClick={() => setVisible(visible ? false : true)}>
+    <div style={blogStyle} className="blog">
+      <div
+        onClick={() => setVisible(visible ? false : true)}
+        className="smallView"
+      >
         {blog.title} {blog.author}
       </div>
-      <div style={extendedBlog}>
+      <div style={extendedBlog} className="extendedView">
         <a href={url()} target="_blank" rel="noopener noreferrer">
           {blog.url}
         </a>

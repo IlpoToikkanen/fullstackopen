@@ -32,10 +32,11 @@ const App = () => {
   }, [user])
 
   useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       blogService.setToken(user.token)
+      console.log(user.token)
       setUser(user)
     }
   }, [])
@@ -48,7 +49,7 @@ const App = () => {
         password: password
       })
 
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
+      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
 
       blogService.setToken(user.token)
       setUser(user)
@@ -110,7 +111,7 @@ const App = () => {
     setUrl(event.target.value)
   }
 
-  const sortedBlogs = blogs.sort((a, b) => (a.likes > b.likes ? -1 : 1))
+  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
   const rows = () =>
     sortedBlogs.map(blog => (
       <Blog
@@ -162,7 +163,7 @@ const App = () => {
   const logoutButton = () => (
     <button
       onClick={() => {
-        window.localStorage.removeItem('loggedBlogappUser')
+        window.localStorage.removeItem('loggedBlogAppUser')
         setUser(null)
       }}
     >
