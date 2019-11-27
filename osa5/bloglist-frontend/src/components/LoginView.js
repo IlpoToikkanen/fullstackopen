@@ -1,33 +1,20 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const LoginView = ({
-  username,
-  password,
-  handleLogin,
-  handleUsernameChange,
-  handlePasswordChange
-}) => {
+const LoginView = ({ username, password, handleLogin }) => {
+  const { reset: _, ...usernameWithoutReset } = username
+  const { reset: __, ...passwordWithoutReset } = password
+
   return (
     <>
       <form onSubmit={handleLogin}>
         <div>
           username
-          <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={handleUsernameChange}
-          />
+          <input {...usernameWithoutReset} />
         </div>
         <div>
           password
-          <input
-            type="password"
-            value={password}
-            name="Password"
-            onChange={handlePasswordChange}
-          />
+          <input {...passwordWithoutReset} />
         </div>
         <button type="submit">login</button>
       </form>
@@ -36,11 +23,11 @@ const LoginView = ({
 }
 
 LoginView.propTypes = {
-  username: PropTypes.string.isRequired,
-  password: PropTypes.string.isRequired,
-  handleLogin: PropTypes.func.isRequired,
-  handleUsernameChange: PropTypes.func.isRequired,
-  handlePasswordChange: PropTypes.func.isRequired
+  username: PropTypes.object.isRequired,
+  password: PropTypes.object.isRequired,
+  handleLogin: PropTypes.func.isRequired
+  /*handleUsernameChange: PropTypes.func.isRequired,
+  handlePasswordChange: PropTypes.func.isRequired*/
 }
 
 export default LoginView
