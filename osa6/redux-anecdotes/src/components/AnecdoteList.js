@@ -4,33 +4,24 @@ import {
   setNotification,
   resetNotification
 } from '../reducers/notificationReducer'
+import { connect } from 'react-redux'
 
-const AnecdoteList = ({ store }) => {
-  const { anecdotes, filter } = store.getState()
-  const sortedAnecdotes = anecdotes.sort((a, b) => b.votes - a.votes)
-  const filteredAnecdotes =
-    filter !== ''
-      ? sortedAnecdotes.filter(anecdote =>
-          anecdote.content.toUpperCase().includes(filter.toUpperCase())
-        )
-      : sortedAnecdotes
-
+const AnecdoteList = props => {
   const vote = id => {
     console.log('vote', id)
-    store.dispatch(addVote(id))
-    store.dispatch(
-      setNotification(
-        `you voted: '${anecdotes.find(a => a.id === id).content}'`
-      )
+    props.addVote(id)
+    props.setNotification(
+      `you voted: '${props.anecdotesToShow.find(a => a.id === id).content}'`
     )
+
     setTimeout(() => {
-      store.dispatch(resetNotification())
+      props.resetNotification()
     }, 5000)
   }
 
   return (
     <>
-      {filteredAnecdotes.map(anecdote => (
+      {props.anecdotesToShow.map(anecdote => (
         <div key={anecdote.id}>
           <div>{anecdote.content}</div>
           <div>
@@ -43,4 +34,30 @@ const AnecdoteList = ({ store }) => {
   )
 }
 
-export default AnecdoteList
+const filteredAnecdotes = ({ anecdotes, filter }) => {
+  const sortedAnecdotes = anecdotes.sort((a, b) => b.votes - a.votes)
+  return filter !== ''
+    ? sortedAnecdotes.filter(anecdote =>
+        anecdote.content.toUpperCase().includes(filter.toUpperCase())
+      )
+    : sortedAnecdotes
+}
+
+const mapStateToProps = state => {
+  // joskus on hyödyllistä tulostaa mapStateToProps:ista...
+  console.log(state)
+  return {
+    anecdotesToShow: filteredAnecdotes(state)
+  }
+}
+const mapDispatchToProps = {
+  addVote,
+  setNotification,
+  resetNotification
+}
+
+const ConnectedAnecdotes = connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(AnecdoteList)
+export default ConnectedAnecdotes
