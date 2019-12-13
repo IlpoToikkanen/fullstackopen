@@ -1,22 +1,18 @@
 import React from 'react'
 import { addVote } from '../reducers/anecdoteReducer'
-import {
-  setNotification,
-  resetNotification
-} from '../reducers/notificationReducer'
+import { setNotification } from '../reducers/notificationReducer'
 import { connect } from 'react-redux'
 
 const AnecdoteList = props => {
-  const vote = id => {
-    console.log('vote', id)
-    props.addVote(id)
+  const vote = anecdote => {
+    console.log('vote', anecdote.id)
+    props.addVote(anecdote)
     props.setNotification(
-      `you voted: '${props.anecdotesToShow.find(a => a.id === id).content}'`
+      `you voted: '${
+        props.anecdotesToShow.find(a => a.id === anecdote.id).content
+      }'`,
+      5
     )
-
-    setTimeout(() => {
-      props.resetNotification()
-    }, 5000)
   }
 
   return (
@@ -26,7 +22,7 @@ const AnecdoteList = props => {
           <div>{anecdote.content}</div>
           <div>
             has {anecdote.votes}
-            <button onClick={() => vote(anecdote.id)}>vote</button>
+            <button onClick={() => vote(anecdote)}>vote</button>
           </div>
         </div>
       ))}{' '}
@@ -44,16 +40,13 @@ const filteredAnecdotes = ({ anecdotes, filter }) => {
 }
 
 const mapStateToProps = state => {
-  // joskus on hyödyllistä tulostaa mapStateToProps:ista...
-  console.log(state)
   return {
     anecdotesToShow: filteredAnecdotes(state)
   }
 }
 const mapDispatchToProps = {
   addVote,
-  setNotification,
-  resetNotification
+  setNotification
 }
 
 const ConnectedAnecdotes = connect(
