@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useField } from './hooks/index'
+import { connect } from 'react-redux'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Blog from './components/Blog'
@@ -7,8 +8,9 @@ import LoginView from './components/LoginView'
 import LoggedView from './components/LoggedView'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+import { setNotification } from './reducers/notificationReducer'
 
-const App = () => {
+const App = props => {
   const [blogs, setBlogs] = useState([])
 
   const username = useField('text')
@@ -19,13 +21,10 @@ const App = () => {
   const [author, setAuthor] = useState('')
   const [url, setUrl] = useState('')
 
-  const [notificationInformation, setNotificationInformation] = useState(null)
-
   useEffect(() => {
     const fetchData = async () => {
       if (user) {
         const initialBlogs = await blogService.getAll()
-        console.log(initialBlogs)
         setBlogs(initialBlogs)
       }
     }
@@ -37,7 +36,6 @@ const App = () => {
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       blogService.setToken(user.token)
-      console.log(user.token)
       setUser(user)
     }
   }, [])
@@ -57,11 +55,11 @@ const App = () => {
       username.reset()
       password.reset()
     } catch (exception) {
-      setNotificationInformation({
-        text: `wrong username or password - ${exception}`,
-        type: 'error'
-      })
-      setTimeout(() => setNotificationInformation(null), 4000)
+      props.setNotification(
+        `wrong username or password - ${exception}`,
+        'error',
+        4
+      )
     }
   }
   const loggedViewRef = React.createRef()
@@ -78,20 +76,17 @@ const App = () => {
       const response = await blogService.create(newBlog)
 
       setBlogs(blogs.concat(response))
-      setNotificationInformation({
-        text: `a new blog ${response.title} by ${response.author} added!`,
-        type: 'notification'
-      })
-      setTimeout(() => setNotificationInformation(null), 4000)
+      props.setNotification(
+        `a new blog ${response.title} by ${response.author} added!`,
+        'notification',
+        4
+      )
+
       setTitle('')
       setAuthor('')
       setUrl('')
     } catch (exception) {
-      setNotificationInformation({
-        text: `${exception}, blogin lisäys`,
-        type: 'error'
-      })
-      setTimeout(() => setNotificationInformation(null), 4000)
+      props.setNotification(`${exception}, blogin lisäys`, 'error', 4)
     }
   }
 
@@ -127,7 +122,7 @@ const App = () => {
   const loginView = () => (
     <>
       <h2>log in to application</h2>
-      <Notification information={notificationInformation} />
+      <Notification />
       <LoginView
         username={username}
         password={password}
@@ -141,7 +136,7 @@ const App = () => {
   const loggedView = () => (
     <>
       <h2>blogs</h2>
-      <Notification information={notificationInformation} />
+      <Notification />
       <p>
         {user.name} logged in {logoutButton()}
       </p>
@@ -179,4 +174,4 @@ const App = () => {
   )
 }
 
-export default App
+export default connect(null, { setNotification })(App)
