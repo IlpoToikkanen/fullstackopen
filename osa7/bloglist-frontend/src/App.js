@@ -90,13 +90,6 @@ const App = props => {
     }
   }
 
-  /*const handleUsernameChange = event => {
-    setUsername(event.target.value)
-  }
-  const handlePasswordChange = event => {
-    setPassword(event.target.value)
-  }*/
-
   const handleTitleChange = event => {
     setTitle(event.target.value)
   }
@@ -126,8 +119,6 @@ const App = props => {
       <LoginView
         username={username}
         password={password}
-        /*handleUsernameChange={handleUsernameChange}
-        handlePasswordChange={handlePasswordChange}*/
         handleLogin={handleLogin}
       />
     </>
@@ -174,4 +165,11 @@ const App = props => {
   )
 }
 
-export default connect(null, { setNotification })(App)
+const mapStateToProps = state => {
+  console.log(state)
+  return {
+    blogs: state.blogs
+  }
+}
+
+export default connect(mapStateToProps, { setNotification })(App)
