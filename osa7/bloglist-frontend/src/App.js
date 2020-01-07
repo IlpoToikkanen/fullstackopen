@@ -8,6 +8,8 @@ import LoginView from './components/LoginView'
 import LoggedView from './components/LoggedView'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
+import UserList from './components/UserList'
+import UserView from './components/UserView'
 import { setNotification } from './reducers/notificationReducer'
 import {
   initializeBlogs,
@@ -169,12 +171,20 @@ const App = props => {
     </button>
   )
 
+  const userById = id => props.users.find(user => user.id === id)
+
   return (
     <div>
       <Router>
         <div>
           {props.user === null ? <>{loginView()}</> : <>{loggedView()}</>}
         </div>
+        <Route exact path="/users" render={() => <UserList />} />
+        <Route
+          exact
+          path="/users/:id"
+          render={({ match }) => <UserView user={userById(match.params.id)} />}
+        />
       </Router>
     </div>
   )
@@ -184,7 +194,8 @@ const mapStateToProps = state => {
   console.log(state)
   return {
     blogs: state.blogs,
-    user: state.user
+    user: state.user,
+    users: state.users
   }
 }
 
