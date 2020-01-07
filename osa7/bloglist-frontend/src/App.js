@@ -9,13 +9,17 @@ import LoggedView from './components/LoggedView'
 import Notification from './components/Notification'
 import Togglable from './components/Togglable'
 import { setNotification } from './reducers/notificationReducer'
+import {
+  initializeBlogs,
+  addBlog,
+  likeBlog,
+  delBlog
+} from './reducers/blogReducer'
+import { setUser } from './reducers/userReducer'
 
 const App = props => {
-  const [blogs, setBlogs] = useState([])
-
   const username = useField('text')
   const password = useField('password')
-  const [user, setUser] = useState(null)
 
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
@@ -23,20 +27,19 @@ const App = props => {
 
   useEffect(() => {
     const fetchData = async () => {
-      if (user) {
-        const initialBlogs = await blogService.getAll()
-        setBlogs(initialBlogs)
+      if (props.user) {
+        props.initializeBlogs()
       }
     }
     fetchData()
-  }, [user])
+  }, [props.user])
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       blogService.setToken(user.token)
-      setUser(user)
+      props.setUser(user)
     }
   }, [])
 
@@ -51,7 +54,7 @@ const App = props => {
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
 
       blogService.setToken(user.token)
-      setUser(user)
+      props.setUser(user)
       username.reset()
       password.reset()
     } catch (exception) {
@@ -73,11 +76,9 @@ const App = props => {
       url: url
     }
     try {
-      const response = await blogService.create(newBlog)
-
-      setBlogs(blogs.concat(response))
+      props.addBlog(newBlog)
       props.setNotification(
-        `a new blog ${response.title} by ${response.author} added!`,
+        `a new blog ${title} by ${author} added!`,
         'notification',
         4
       )
@@ -100,15 +101,16 @@ const App = props => {
     setUrl(event.target.value)
   }
 
-  const sortedBlogs = blogs.sort((a, b) => b.likes - a.likes)
+  const sortedBlogs = props.blogs.sort((a, b) => b.likes - a.likes)
   const rows = () =>
     sortedBlogs.map(blog => (
       <Blog
         key={blog.id}
         blog={blog}
-        blogs={blogs}
-        setBlogs={setBlogs}
-        user={user}
+        blogs={props.blogs}
+        delBlog={props.delBlog}
+        user={props.user}
+        likeBlog={props.likeBlog}
       />
     ))
 
@@ -129,7 +131,7 @@ const App = props => {
       <h2>blogs</h2>
       <Notification />
       <p>
-        {user.name} logged in {logoutButton()}
+        {props.user.name} logged in {logoutButton()}
       </p>
       <Togglable buttonLabel="new blog" ref={loggedViewRef}>
         <>
@@ -151,7 +153,7 @@ const App = props => {
     <button
       onClick={() => {
         window.localStorage.removeItem('loggedBlogAppUser')
-        setUser(null)
+        props.setUser(null)
       }}
     >
       logout
@@ -160,7 +162,9 @@ const App = props => {
 
   return (
     <>
-      <div>{user === null ? <>{loginView()}</> : <>{loggedView()}</>}</div>
+      <div>
+        {props.user === null ? <>{loginView()}</> : <>{loggedView()}</>}
+      </div>
     </>
   )
 }
@@ -168,8 +172,18 @@ const App = props => {
 const mapStateToProps = state => {
   console.log(state)
   return {
-    blogs: state.blogs
+    blogs: state.blogs,
+    user: state.user
   }
 }
 
-export default connect(mapStateToProps, { setNotification })(App)
+const mapDispatchToProps = {
+  setUser,
+  initializeBlogs,
+  addBlog,
+  likeBlog,
+  delBlog,
+  setNotification
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(App)

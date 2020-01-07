@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import blogService from '../services/blogs'
 import tokenParser from '../utils/tokenParser'
+import { likeBlog } from '../reducers/blogReducer'
 
-const Blog = ({ blog, blogs, setBlogs, user }) => {
+const Blog = ({ blog, blogs, delBlog, user }) => {
   const [visible, setVisible] = useState(false)
 
   const blogStyle = {
@@ -20,32 +21,10 @@ const Blog = ({ blog, blogs, setBlogs, user }) => {
     return `https://${blog.url}`
   }
 
-  const like = async () => {
-    const likedBlog = {
-      title: blog.title,
-      author: blog.author,
-      url: blog.url,
-      likes: blog.likes + 1
-    }
-    try {
-      await blogService.likeBlog(blog.id, likedBlog)
-      setBlogs(
-        blogs.map(originalBlog =>
-          originalBlog.id !== blog.id
-            ? originalBlog
-            : { ...blog, likes: blog.likes + 1 }
-        )
-      )
-    } catch (exception) {
-      console.log(exception, 'like')
-    }
-  }
-
   const remove = async () => {
     if (window.confirm(`remove blog ${blog.title} by ${blog.author} ?`)) {
       try {
-        await blogService.deleteBlog(blog.id)
-        setBlogs(blogs.filter(originalBlog => originalBlog.id !== blog.id))
+        delBlog(blog.id)
       } catch (exception) {
         console.log(exception, 'poisto')
       }
@@ -61,6 +40,28 @@ const Blog = ({ blog, blogs, setBlogs, user }) => {
       return <button onClick={() => remove()}>remove</button>
     }
     return null
+  }
+
+  const like = async () => {
+    const likedBlog = {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes + 1
+    }
+    try {
+      likeBlog(blog.id, likedBlog)
+      //await blogService.like(blog.id, likedBlog)
+      /*setBlogs(
+        blogs.map(originalBlog =>
+          originalBlog.id !== blog.id
+            ? originalBlog
+            : { ...blog, likes: blog.likes + 1 }
+        )
+      )*/
+    } catch (exception) {
+      console.log(exception, 'like')
+    }
   }
 
   return (

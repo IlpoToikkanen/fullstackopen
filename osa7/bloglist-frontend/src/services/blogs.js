@@ -20,8 +20,10 @@ const create = async newBlog => {
   return response.data
 }
 
-const likeBlog = async (id, likedBlog) => {
+const like = async (id, likedBlog) => {
+  console.log('tö123')
   const response = await axios.put(`${baseUrl}/${id}`, likedBlog)
+  console.log(response.data)
   return response.data
 }
 
@@ -33,4 +35,4 @@ const deleteBlog = async id => {
   return response.data
 }
 
-export default { getAll, create, setToken, likeBlog, deleteBlog }
+export default { getAll, create, setToken, like, deleteBlog }
