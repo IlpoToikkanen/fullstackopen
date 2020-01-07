@@ -53,9 +53,8 @@ const blogReducer = (state = [], action) => {
     case 'DEL_BLOG':
       return state.filter(originalBlog => originalBlog.id !== action.id)
     case 'LIKE_BLOG':
-      console.log('täällä')
-      return state.map(originalBlog =>
-        originalBlog.id !== action.id ? originalBlog : action.data.likedBlog
+      return state.map(blog =>
+        blog.id === action.data.id ? action.data.likedBlog : blog
       )
     default:
       return state

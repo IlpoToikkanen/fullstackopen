@@ -1,9 +1,8 @@
 import React, { useState } from 'react'
-import blogService from '../services/blogs'
+//import blogService from '../services/blogs'
 import tokenParser from '../utils/tokenParser'
-import { likeBlog } from '../reducers/blogReducer'
 
-const Blog = ({ blog, blogs, delBlog, user }) => {
+const Blog = ({ blog, delBlog, likeBlog, user }) => {
   const [visible, setVisible] = useState(false)
 
   const blogStyle = {
@@ -51,14 +50,6 @@ const Blog = ({ blog, blogs, delBlog, user }) => {
     }
     try {
       likeBlog(blog.id, likedBlog)
-      //await blogService.like(blog.id, likedBlog)
-      /*setBlogs(
-        blogs.map(originalBlog =>
-          originalBlog.id !== blog.id
-            ? originalBlog
-            : { ...blog, likes: blog.likes + 1 }
-        )
-      )*/
     } catch (exception) {
       console.log(exception, 'like')
     }

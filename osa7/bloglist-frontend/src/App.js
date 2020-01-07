@@ -16,6 +16,14 @@ import {
   delBlog
 } from './reducers/blogReducer'
 import { setUser } from './reducers/userReducer'
+import { initializeUsers } from './reducers/usersReducer'
+import {
+  BrowserRouter as Router,
+  Route,
+  Link,
+  Redirect,
+  withRouter
+} from 'react-router-dom'
 
 const App = props => {
   const username = useField('text')
@@ -30,6 +38,7 @@ const App = props => {
       if (props.user) {
         props.initializeBlogs()
       }
+      props.initializeUsers()
     }
     fetchData()
   }, [props.user])
@@ -161,11 +170,13 @@ const App = props => {
   )
 
   return (
-    <>
-      <div>
-        {props.user === null ? <>{loginView()}</> : <>{loggedView()}</>}
-      </div>
-    </>
+    <div>
+      <Router>
+        <div>
+          {props.user === null ? <>{loginView()}</> : <>{loggedView()}</>}
+        </div>
+      </Router>
+    </div>
   )
 }
 
@@ -183,7 +194,8 @@ const mapDispatchToProps = {
   addBlog,
   likeBlog,
   delBlog,
-  setNotification
+  setNotification,
+  initializeUsers
 }
 
 export default connect(mapStateToProps, mapDispatchToProps)(App)
