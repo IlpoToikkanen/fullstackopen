@@ -1,15 +1,15 @@
-import React, { useState, useEffect } from 'react'
-import { useField } from './hooks/index'
-import { connect } from 'react-redux'
+import React, { useEffect } from 'react'
+
 import blogService from './services/blogs'
-import loginService from './services/login'
-import Blog from './components/Blog'
+
 import LoginView from './components/LoginView'
-import LoggedView from './components/LoggedView'
 import Notification from './components/Notification'
-import Togglable from './components/Togglable'
 import UserList from './components/UserList'
 import UserView from './components/UserView'
+import BlogView from './components/BlogView'
+import NavMenu from './components/NavMenu'
+import BlogList from './components/BlogList'
+
 import { setNotification } from './reducers/notificationReducer'
 import {
   initializeBlogs,
@@ -19,21 +19,21 @@ import {
 } from './reducers/blogReducer'
 import { setUser } from './reducers/userReducer'
 import { initializeUsers } from './reducers/usersReducer'
-import {
-  BrowserRouter as Router,
-  Route,
-  Link,
-  Redirect,
-  withRouter
-} from 'react-router-dom'
+
+import { BrowserRouter as Router, Route } from 'react-router-dom'
+import { connect } from 'react-redux'
+
+import { Container, Header } from 'semantic-ui-react'
 
 const App = props => {
-  const username = useField('text')
-  const password = useField('password')
-
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [url, setUrl] = useState('')
+  useEffect(() => {
+    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
+    if (loggedUserJSON) {
+      const user = JSON.parse(loggedUserJSON)
+      blogService.setToken(user.token)
+      props.setUser(user)
+    }
+  }, [])
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,146 +45,50 @@ const App = props => {
     fetchData()
   }, [props.user])
 
-  useEffect(() => {
-    const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
-    if (loggedUserJSON) {
-      const user = JSON.parse(loggedUserJSON)
-      blogService.setToken(user.token)
-      props.setUser(user)
-    }
-  }, [])
-
-  const handleLogin = async event => {
-    event.preventDefault()
-    try {
-      const user = await loginService.login({
-        username: username.value,
-        password: password.value
-      })
-
-      window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
-
-      blogService.setToken(user.token)
-      props.setUser(user)
-      username.reset()
-      password.reset()
-    } catch (exception) {
-      props.setNotification(
-        `wrong username or password - ${exception}`,
-        'error',
-        4
-      )
-    }
-  }
-  const loggedViewRef = React.createRef()
-
-  const addBlog = async event => {
-    event.preventDefault()
-    loggedViewRef.current.toggleVisibility()
-    const newBlog = {
-      title: title,
-      author: author,
-      url: url
-    }
-    try {
-      props.addBlog(newBlog)
-      props.setNotification(
-        `a new blog ${title} by ${author} added!`,
-        'notification',
-        4
-      )
-
-      setTitle('')
-      setAuthor('')
-      setUrl('')
-    } catch (exception) {
-      props.setNotification(`${exception}, blogin lisäys`, 'error', 4)
-    }
-  }
-
-  const handleTitleChange = event => {
-    setTitle(event.target.value)
-  }
-  const handleAuthorChange = event => {
-    setAuthor(event.target.value)
-  }
-  const handleUrlChange = event => {
-    setUrl(event.target.value)
-  }
-
-  const sortedBlogs = props.blogs.sort((a, b) => b.likes - a.likes)
-  const rows = () =>
-    sortedBlogs.map(blog => (
-      <Blog
-        key={blog.id}
-        blog={blog}
-        blogs={props.blogs}
-        delBlog={props.delBlog}
-        user={props.user}
-        likeBlog={props.likeBlog}
-      />
-    ))
-
-  const loginView = () => (
-    <>
-      <h2>log in to application</h2>
-      <Notification />
-      <LoginView
-        username={username}
-        password={password}
-        handleLogin={handleLogin}
-      />
-    </>
-  )
-
-  const loggedView = () => (
-    <>
-      <h2>blogs</h2>
-      <Notification />
-      <p>
-        {props.user.name} logged in {logoutButton()}
-      </p>
-      <Togglable buttonLabel="new blog" ref={loggedViewRef}>
-        <>
-          <LoggedView
-            title={title}
-            author={author}
-            url={url}
-            addBlog={addBlog}
-            handleTitleChange={handleTitleChange}
-            handleAuthorChange={handleAuthorChange}
-            handleUrlChange={handleUrlChange}
-          />
-        </>
-      </Togglable>
-      {rows()}
-    </>
-  )
-  const logoutButton = () => (
-    <button
-      onClick={() => {
-        window.localStorage.removeItem('loggedBlogAppUser')
-        props.setUser(null)
-      }}
-    >
-      logout
-    </button>
-  )
-
   const userById = id => props.users.find(user => user.id === id)
+  const blogById = id => {
+    console.log(props.blogs)
+    return props.blogs.find(blog => blog.id === id)
+  }
+
+  if (props.user === null) {
+    return (
+      <Container>
+        <LoginView />
+      </Container>
+    )
+  }
 
   return (
     <div>
       <Router>
-        <div>
-          {props.user === null ? <>{loginView()}</> : <>{loggedView()}</>}
-        </div>
-        <Route exact path="/users" render={() => <UserList />} />
-        <Route
-          exact
-          path="/users/:id"
-          render={({ match }) => <UserView user={userById(match.params.id)} />}
-        />
+        <Container>
+          <NavMenu />
+          <Notification />
+          <div>
+            <Header as="h1" style={{ padding: '10px 10px 10px 0px' }}>
+              Blog app
+            </Header>
+          </div>
+          <Route exact path="/" render={() => <BlogList />} />
+          <Route exact path="/blogs" render={() => <BlogList />} />
+
+          <Route
+            exact
+            path="/blogs/:id"
+            render={({ match }) =>
+              props.blogs ? <BlogView blog={blogById(match.params.id)} /> : null
+            }
+          />
+          <Route exact path="/users" render={() => <UserList />} />
+          <Route
+            exact
+            path="/users/:id"
+            render={({ match }) => (
+              <UserView user={userById(match.params.id)} />
+            )}
+          />
+        </Container>
       </Router>
     </div>
   )

@@ -33,7 +33,8 @@ blogsRouter.post('/', async (request, response, next) => {
       author: body.author,
       url: body.url,
       likes: body.likes === undefined ? 0 : body.likes,
-      user: user._id
+      user: user._id,
+      comments: []
     })
 
     const savedBlog = await blog.save()
@@ -75,13 +76,41 @@ blogsRouter.put('/:id', async (request, response, next) => {
     title: body.title,
     author: body.author,
     url: body.url,
-    likes: body.likes
+    likes: body.likes,
+    comments: body.comments
   }
   try {
     const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {
       new: true
-    })
+    }).populate('user')
     response.json(updatedBlog.toJSON())
+  } catch (exception) {
+    next(exception)
+  }
+})
+
+blogsRouter.post('/:id/comments', async (request, response, next) => {
+  const newComment = request.body.value
+  console.log(request.body)
+
+  try {
+    console.log('täällä')
+    const origBlog = await Blog.findById(request.params.id)
+    const blogWithComment = {
+      title: origBlog.title,
+      author: origBlog.author,
+      url: origBlog.url,
+      likes: origBlog.likes,
+      comments: origBlog.comments.concat(newComment)
+    }
+    console.log(origBlog)
+    console.log(blogWithComment)
+    const commentedBlog = await Blog.findByIdAndUpdate(
+      request.params.id,
+      blogWithComment,
+      { new: true }
+    )
+    response.json(commentedBlog.toJSON())
   } catch (exception) {
     next(exception)
   }

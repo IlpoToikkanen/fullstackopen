@@ -1,7 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 
-const LoggedView = ({
+import { Button, Form } from 'semantic-ui-react'
+
+const NewBlogForm = ({
   title,
   author,
   url,
@@ -14,42 +16,44 @@ const LoggedView = ({
     <>
       <h2>create new</h2>
       <div>
-        <form onSubmit={addBlog}>
-          <div>
-            title:{' '}
+        <Form onSubmit={addBlog}>
+          <Form.Field>
+            <label>title: </label>
             <input
               type="text"
               value={title}
               name="Title"
               onChange={handleTitleChange}
             />
-          </div>
-          <div>
-            author:{' '}
+          </Form.Field>
+          <Form.Field>
+            <label>author: </label>
             <input
               type="text"
               value={author}
               name="Author"
               onChange={handleAuthorChange}
             />
-          </div>
-          <div>
-            url:{' '}
+          </Form.Field>
+          <Form.Field>
+            <label>url: </label>
             <input
               type="text"
               value={url}
               name="Url"
               onChange={handleUrlChange}
             />
-          </div>
-          <button type="submit">create</button>
-        </form>
+          </Form.Field>
+          <Button primary /*style={{ padding:  }}*/ type="submit">
+            create
+          </Button>
+        </Form>
       </div>
     </>
   )
 }
 
-LoggedView.propTypes = {
+NewBlogForm.propTypes = {
   title: PropTypes.string.isRequired,
   author: PropTypes.string.isRequired,
   url: PropTypes.string.isRequired,
@@ -59,4 +63,4 @@ LoggedView.propTypes = {
   handleUrlChange: PropTypes.func.isRequired
 }
 
-export default LoggedView
+export default NewBlogForm

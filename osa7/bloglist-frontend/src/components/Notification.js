@@ -6,7 +6,8 @@ const Notification = props => {
     color: props.notification.category === 'error' ? 'red' : 'green',
     border: '2px solid green',
     borderRadius: '5px',
-    fontSize: '25px'
+    fontSize: '25px',
+    padding: '20px'
   }
 
   if (props.notification.message === null) {
@@ -21,7 +22,6 @@ const Notification = props => {
 }
 
 const mapStateToProps = state => {
-  console.log(state)
   return {
     notification: state.notification
   }

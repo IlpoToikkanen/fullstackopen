@@ -1,34 +1,38 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 
+import { Link } from 'react-router-dom'
 import { connect } from 'react-redux'
+
+import { Table } from 'semantic-ui-react'
 
 const UserList = props => {
   const userTable = props.users.map(user => {
     return (
-      <tr key={user.id}>
-        <td>
+      <Table.Row key={user.id}>
+        <Table.Cell>
           <Link to={`/users/${user.id}`}> {user.name} </Link>
-        </td>
-        <td>{user.blogs.length}</td>
-      </tr>
+        </Table.Cell>
+        <Table.Cell>{user.blogs.length}</Table.Cell>
+      </Table.Row>
     )
   })
 
   return (
     <div>
       <h2>Users</h2>
-      <table>
+      <Table striped celled>
         <thead>
-          <tr>
-            <td></td>
-            <td>
+          <Table.Row>
+            <Table.Cell>
+              <strong>User</strong>
+            </Table.Cell>
+            <Table.Cell>
               <strong>blogs created</strong>
-            </td>
-          </tr>
+            </Table.Cell>
+          </Table.Row>
         </thead>
-        <tbody>{userTable}</tbody>
-      </table>
+        <Table.Body>{userTable}</Table.Body>
+      </Table>
     </div>
   )
 }

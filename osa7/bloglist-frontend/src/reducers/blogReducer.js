@@ -31,13 +31,22 @@ export const delBlog = id => {
 }
 
 export const likeBlog = (id, blog) => {
-  console.log(id, blog)
   return async dispatch => {
-    console.log('here')
-    const likedBlog = await blogService.like(id, blog)
+    const likedB = await blogService.like(id, blog)
+
     dispatch({
       type: 'LIKE_BLOG',
-      data: { id, likedBlog }
+      data: { id, likedB }
+    })
+  }
+}
+
+export const commentBlog = (id, comment) => {
+  return async dispatch => {
+    const commentedBlog = await blogService.comment(id, comment)
+    dispatch({
+      type: 'COMMENT_BLOG',
+      data: { id, commentedBlog }
     })
   }
 }
@@ -54,7 +63,11 @@ const blogReducer = (state = [], action) => {
       return state.filter(originalBlog => originalBlog.id !== action.id)
     case 'LIKE_BLOG':
       return state.map(blog =>
-        blog.id === action.data.id ? action.data.likedBlog : blog
+        blog.id === action.data.id ? action.data.likedB : blog
+      )
+    case 'COMMENT_BLOG':
+      return state.map(blog =>
+        blog.id === action.data.id ? action.data.commentedBlog : blog
       )
     default:
       return state

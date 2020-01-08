@@ -1,5 +1,3 @@
-import loginService from '../services/login'
-
 export const setUser = user => {
   return dispatch => {
     dispatch({
