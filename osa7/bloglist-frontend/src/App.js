@@ -26,71 +26,70 @@ import { connect } from 'react-redux'
 import { Container, Header } from 'semantic-ui-react'
 
 const App = props => {
+  const setUser = props.setUser
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogAppUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
       blogService.setToken(user.token)
-      props.setUser(user)
+      setUser(user)
     }
-  }, [])
+  }, [setUser])
 
+  const initializeUsers = props.initializeUsers
+  const initializeBlogs = props.initializeBlogs
+  const user = props.user
   useEffect(() => {
     const fetchData = async () => {
-      if (props.user) {
-        props.initializeBlogs()
+      if (user) {
+        initializeBlogs()
       }
-      props.initializeUsers()
+      initializeUsers()
     }
     fetchData()
-  }, [props.user])
+  }, [user, initializeBlogs, initializeUsers])
 
   const userById = id => props.users.find(user => user.id === id)
-  const blogById = id => {
-    console.log(props.blogs)
-    return props.blogs.find(blog => blog.id === id)
-  }
+  const blogById = id => props.blogs.find(blog => blog.id === id)
 
   if (props.user === null) {
     return (
       <Container>
-        <LoginView />
+        <Router>
+          <LoginView />
+        </Router>
       </Container>
     )
   }
 
   return (
-    <div>
+    <Container>
       <Router>
-        <Container>
-          <NavMenu />
-          <Notification />
-          <div>
-            <Header as="h1" style={{ padding: '10px 10px 10px 0px' }}>
-              Blog app
-            </Header>
-          </div>
-          <Route exact path="/" render={() => <BlogList />} />
-          <Route exact path="/blogs" render={() => <BlogList />} />
+        <NavMenu />
+        <Notification />
+        <div>
+          <Header as="h1" style={{ padding: '10px 10px 10px 0px' }}>
+            Blog app
+          </Header>
+        </div>
+        <Route exact path="/" render={() => <BlogList />} />
+        <Route exact path="/blogs" render={() => <BlogList />} />
 
-          <Route
-            exact
-            path="/blogs/:id"
-            render={({ match }) =>
-              props.blogs ? <BlogView blog={blogById(match.params.id)} /> : null
-            }
-          />
-          <Route exact path="/users" render={() => <UserList />} />
-          <Route
-            exact
-            path="/users/:id"
-            render={({ match }) => (
-              <UserView user={userById(match.params.id)} />
-            )}
-          />
-        </Container>
+        <Route
+          exact
+          path="/blogs/:id"
+          render={({ match }) =>
+            props.blogs ? <BlogView blog={blogById(match.params.id)} /> : null
+          }
+        />
+        <Route exact path="/users" render={() => <UserList />} />
+        <Route
+          exact
+          path="/users/:id"
+          render={({ match }) => <UserView user={userById(match.params.id)} />}
+        />
       </Router>
-    </div>
+    </Container>
   )
 }
 

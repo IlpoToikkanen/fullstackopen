@@ -1,7 +1,8 @@
 import React, { useState } from 'react'
 import { connect } from 'react-redux'
-import { addBlog } from '../reducers/blogReducer'
+import { addBlog, initializeBlogs } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
+import { initializeUsers } from '../reducers/usersReducer'
 import Togglable from './Togglable'
 import NewBlogForm from './NewBlogForm'
 import Blog from './Blog'
@@ -22,7 +23,9 @@ const BlogList = props => {
       url: url
     }
     try {
-      props.addBlog(newBlog)
+      await props.addBlog(newBlog)
+      props.initializeUsers()
+      props.initializeBlogs()
       props.setNotification(
         `a new blog ${title} by ${author} added!`,
         'notification',
@@ -79,4 +82,9 @@ const mapStateToProps = state => {
     blogs: state.blogs
   }
 }
-export default connect(mapStateToProps, { addBlog, setNotification })(BlogList)
+export default connect(mapStateToProps, {
+  addBlog,
+  initializeBlogs,
+  setNotification,
+  initializeUsers
+})(BlogList)

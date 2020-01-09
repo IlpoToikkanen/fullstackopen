@@ -21,9 +21,7 @@ const create = async newBlog => {
 }
 
 const like = async (id, likedBlog) => {
-  console.log('tö123')
   const response = await axios.put(`${baseUrl}/${id}`, likedBlog)
-  console.log(response.data)
   return response.data
 }
 

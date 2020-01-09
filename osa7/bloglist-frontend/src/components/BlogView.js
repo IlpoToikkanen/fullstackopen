@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom'
 
 import { likeBlog, delBlog, commentBlog } from '../reducers/blogReducer'
 import { setNotification } from '../reducers/notificationReducer'
+import { initializeUsers } from '../reducers/usersReducer'
 
 import { useField } from '../hooks/index'
 
@@ -46,7 +47,9 @@ const BlogView = props => {
   const remove = async () => {
     if (window.confirm(`remove blog ${blog.title} by ${blog.author} ?`)) {
       try {
-        props.delBlog(blog.id)
+        await props.delBlog(blog.id)
+        props.initializeUsers()
+        console.log(props.users)
         props.setNotification(
           `blog ${blog.title} by ${blog.author} deleted!`,
           'notification',
@@ -87,7 +90,9 @@ const BlogView = props => {
   return (
     <>
       <div>
-        <h2>{blog.title}</h2>
+        <h2>
+          {blog.title} by {blog.author}
+        </h2>
         <a href={url()} target="_blank" rel="noopener noreferrer">
           {blog.url}
         </a>
@@ -117,7 +122,8 @@ const mapStateToProps = (state, ownProps) => {
   return {
     user: state.user,
     notification: state.notification,
-    blog: ownProps.blog
+    blog: ownProps.blog,
+    users: state.users
   }
 }
 
@@ -125,7 +131,8 @@ const mapDispatchToProps = {
   setNotification,
   likeBlog,
   delBlog,
-  commentBlog
+  commentBlog,
+  initializeUsers
 }
 
 export default connect(

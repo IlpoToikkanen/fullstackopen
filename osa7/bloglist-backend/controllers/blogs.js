@@ -91,10 +91,8 @@ blogsRouter.put('/:id', async (request, response, next) => {
 
 blogsRouter.post('/:id/comments', async (request, response, next) => {
   const newComment = request.body.value
-  console.log(request.body)
 
   try {
-    console.log('täällä')
     const origBlog = await Blog.findById(request.params.id)
     const blogWithComment = {
       title: origBlog.title,
@@ -103,13 +101,11 @@ blogsRouter.post('/:id/comments', async (request, response, next) => {
       likes: origBlog.likes,
       comments: origBlog.comments.concat(newComment)
     }
-    console.log(origBlog)
-    console.log(blogWithComment)
     const commentedBlog = await Blog.findByIdAndUpdate(
       request.params.id,
       blogWithComment,
       { new: true }
-    )
+    ).populate('user')
     response.json(commentedBlog.toJSON())
   } catch (exception) {
     next(exception)

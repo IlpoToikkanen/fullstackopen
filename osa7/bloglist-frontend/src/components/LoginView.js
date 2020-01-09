@@ -1,6 +1,7 @@
 import React from 'react'
 import { useField } from '../hooks/index'
 import { connect } from 'react-redux'
+import { withRouter } from 'react-router-dom'
 import { setUser } from '../reducers/userReducer'
 import { setNotification } from '../reducers/notificationReducer'
 import loginService from '../services/login'
@@ -26,10 +27,11 @@ const LoginView = props => {
 
       window.localStorage.setItem('loggedBlogAppUser', JSON.stringify(user))
 
-      blogService.setToken(user.token)
-      props.setUser(user)
       username.reset()
       password.reset()
+      blogService.setToken(user.token)
+      props.setUser(user)
+      props.history.push('/')
     } catch (exception) {
       props.setNotification(
         `wrong username or password - ${exception}`,
@@ -72,4 +74,7 @@ const mapDispatchToProps = {
   setNotification
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginView)
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(withRouter(LoginView))

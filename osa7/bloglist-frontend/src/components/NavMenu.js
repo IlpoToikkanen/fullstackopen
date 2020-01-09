@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import { setUser } from '../reducers/userReducer'
 
 import { Button, Menu } from 'semantic-ui-react'
+import { withRouter } from 'react-router-dom'
 
 const NavMenu = props => {
   const logoutButton = () => (
@@ -12,6 +13,7 @@ const NavMenu = props => {
       onClick={() => {
         window.localStorage.removeItem('loggedBlogAppUser')
         props.setUser(null)
+        props.history.push('/')
       }}
     >
       logout
@@ -37,4 +39,4 @@ const mapStateToProps = state => {
   }
 }
 
-export default connect(mapStateToProps, { setUser })(NavMenu)
+export default connect(mapStateToProps, { setUser })(withRouter(NavMenu))
